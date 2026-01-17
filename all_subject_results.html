@@ -61,16 +61,13 @@
     <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
     <nav class="sidebar" id="sidebar">
         <ul>
-            <li><a href="dashboard.html">🏠 Dashboard</a></li>
-                <li><a href="enrollment.html">👥 Grade 7 Enrollment</a></li>
-                <li><a href="daily_register.html">📝 Daily Register</a></li>
-                <li><a href="mark_entry.html">📊 Enter Marks 2 Subjects</a></li>
-                <li><a href="view_marks.html">📜 View Results 2 Subjects</a></li>
-                <li><a href="daily_attendance_list.html" style="background: #34495e;">📂 Termly Attendance</a></li>
-                <li><a href="mark_entry_all.html">📂 Enter All Subjects</a></li>
-                <li><a href="all_subject_results.html">📂 View All Subjects</a></li>
-                <li><a href="term_attendance.html">📂 Term Attendance</a></li>
-                <li><a href="#" onclick="logout()" style="color: var(--danger);">🚪 Logout</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="enrollment.html">Enrollment</a></li>
+            <li><a href="daily_register.html">Daily Register</a></li>
+            <li><a href="mark_entry.html">Enter Marks</a></li>
+            <li><a href="view_marks.html">Main Results</a></li>
+            <li><a href="all_subjects_results.html" style="background:var(--accent)">All Subjects View</a></li>
+            <li><a href="term_attendance.html">Term Attendance</a></li>
         </ul>
     </nav>
 
@@ -89,11 +86,11 @@
 
             <div class="performance-grid">
                 <div class="perf-card top-performers">
-                    <h3 style="margin-top:0; color:var(--success)">🌟 Overall Top 3 (Total Marks)</h3>
+                    <h3 style="margin-top:0; color:var(--success)">🌟 Top 10 Performers (Total Marks)</h3>
                     <div id="top-list"></div>
                 </div>
                 <div class="perf-card bottom-performers">
-                    <h3 style="margin-top:0; color:var(--danger)">⚠️ Support Required (Below 40% Avg)</h3>
+                    <h3 style="margin-top:0; color:var(--danger)">⚠️ Support Required (10 Lowest Performing)</h3>
                     <div id="bottom-list"></div>
                 </div>
             </div>
@@ -192,15 +189,18 @@
                               buildFooterRow("Total Girls Avg", stats.girls) + 
                               buildFooterRow("GRAND CLASS MEAN", grandTotalStats);
 
-            // Analysis Cards
-            document.getElementById('top-list').innerHTML = scoredStudents.slice(0, 3).map((s, i) => 
-                `<div>${i+1}. ${s.name} - <strong>${s.total.toFixed(0)} Marks</strong></div>`
-            ).join('') || "No data";
+            // ANALYSIS CARDS - UPDATED LOGIC
+            // 1. Top 10 Performers
+            document.getElementById('top-list').innerHTML = scoredStudents.slice(0, 10).map((s, i) => 
+                `<div style="font-size: 0.9em; margin-bottom: 2px;">${i+1}. ${s.name} - <strong>${s.total.toFixed(0)} Marks</strong></div>`
+            ).join('') || "No data available";
 
-            const support = scoredStudents.filter(s => (s.total / subjects.length) < 40);
-            document.getElementById('bottom-list').innerHTML = support.map(s => 
-                `<div>• ${s.name} (Total: ${s.total.toFixed(0)})</div>`
-            ).join('') || "All students above 40% average";
+            // 2. 10 Lowest Performing (Support Required)
+            // We take the last 10 elements from the sorted list and reverse them so the very lowest is at the top
+            const supportList = [...scoredStudents].reverse().slice(0, 10);
+            document.getElementById('bottom-list').innerHTML = supportList.map((s, i) => 
+                `<div style="font-size: 0.9em; margin-bottom: 2px;">• ${s.name} (Total: ${s.total.toFixed(0)})</div>`
+            ).join('') || "No data available";
         }
 
         // Feature Implementations
